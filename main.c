@@ -20,11 +20,25 @@ int main() {
 	else
 		printf("Next index: %zu\n", next_index);
 
-	String sub = string_substring(hello, 2, 7);
-	printf("Substring 2 - 7: %s\n", sub.content);
+	String lo = string_substring(hello, 3, 5);
+	String l = string_substring(hello, 10, 11);
+	string_append(&lo, l.content);
+	printf("==> %s\n", lo.content);
+
+	char* cstr = string_to_cstr(lo);
+	printf("String to cstr: %s\n", cstr);
+
+	String list = string_new("apple, banana, butter");
+	StringList sl = string_split(list, ',');
+	for (int i = 0; i < sl.size; ++i) {
+		printf("item[%d]: %s\n", i, sl.items[i].content);
+	}
 
 	// TODO: implement arena to free everything at once
+	stringlist_free(&sl);
+	string_free(&list);
 	string_free(&hello);
-	string_free(&sub);
+	string_free(&lo);
+	string_free(&l);
 	return 0;
 }

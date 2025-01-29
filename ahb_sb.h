@@ -6,6 +6,8 @@
 #include <assert.h>
 #include <stdbool.h>
 
+// TODO: implement to pass an arena to the alloations take place
+
 #define INITIAL_CAPACITY 1024
 #define GIGABYTE (1024 * 1024 * 1024)
 
@@ -34,6 +36,7 @@ size_t string_index_of(String* str, char c);
 size_t string_next_index(String* str);                        // Returns the next index of the previously called string_index_of(). Calls string_index_of() if it wasn't called before.
                                                               // No more characters: returns IDX_NO_MORE_ENTRIES
 String string_substring(String str, size_t ini, size_t end);  // ini (inclusive), end (exclusive)
+//String string_concat(String str1, ...);  TODO: concatenation function with variadic arguments (all String type)
 char*  string_to_cstr(String str);
 
 StringList string_split(String str, char separator);
@@ -91,6 +94,7 @@ void string_append(String* str, char* text) {
   size_t new_len = text_len + str->length;
   bool need_realloc = new_len > str->capacity;
   while (new_len > str->capacity) {
+    printf("len: %zu  > cap: %zu\n", new_len, str->capacity);
     str->capacity *= 2;
     if (str->capacity > GIGABYTE) panic("String is too long (> 1 GB)");
   }
@@ -134,22 +138,20 @@ size_t string_next_index(String* str) {
 String string_substring(String str, size_t ini, size_t end) {
   if (ini >= end || ini < 0 || end > str.length) return string_new("");
   size_t size = end - ini;
-  printf("ini: %zu\n", ini);
+
   String new_string = {0};
   new_string.length = size;
-  new_string.content = calloc(size +1, sizeof(char));
+  new_string.capacity = INITIAL_CAPACITY;
+  new_string.content = calloc(INITIAL_CAPACITY, sizeof(char));
   assert(new_string.content && "Buy more RAM");
+
   memcpy(new_string.content, str.content + ini, size);
   new_string.content[size] = '\0';
   return new_string;
 }
 
 char* string_to_cstr(String str) {
-  char* cstr = calloc(str.length + 1, sizeof(char));
-  assert(cstr && "Buy more RAM");
-  memcpy(cstr, str.content, str.length);
-  cstr[str.length] = '\0';
-  return cstr;
+  return str.content;
 }
 
 StringList string_split(String str, char separator) {
